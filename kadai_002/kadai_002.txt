@@ -1,0 +1,33 @@
+
+!pip install requests
+import requests
+import pprint
+from getpass import getpass
+api_key = getpass('APIキーを入力してください: ')
+search_word = input('検索する駅名を入力してください: ')
+geocode_url = "https://maps.googleapis.com/maps/api/geocode/json"
+geocode_params = {"address":search_word, "key": api_key
+    }
+geocode_response = requests.get(geocode_url,params=geocode_params)
+geocode_data=geocode_response.json()
+if geocode_data["results"]:
+    location = geocode_data["results"][0]["geometry"]["location"]
+    lat,lng = location["lat"],location["lng"]
+else:
+    print("Could not find the specified station")
+    exit()
+places_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+places_params = {
+    "location": f"{lat},{lng}",
+    "language": "japanese",
+    "radius": 500,
+    "type": "restaurant",
+    "key": api_key
+}
+places_response = requests.get(places_url, params=places_params)
+places_data = places_response.json()
+for restaurant in places_data["results"]:
+    name = restaurant["name"]
+    rating = restaurant.get("rating","No rating")
+    address = restaurant["vicinity"]
+    print(f"Name: {name}, Rating: {rating},Address: {address}")
