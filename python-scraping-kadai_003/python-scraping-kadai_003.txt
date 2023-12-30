@@ -1,0 +1,73 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from getpass import getpass
+
+chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument('--headless')
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--disable-dev-shm-usage')
+
+driver = webdriver.Chrome(options=chrome_options)
+driver.get('https://terakoya.sejuku.net/register')
+
+wait = WebDriverWait(driver, 30)
+
+header_login_button = wait.until(
+    EC.visibility_of_element_located(
+        (By.CSS_SELECTOR,
+         '#root > header > div.sc-jgyNOb.eGDJQH')
+    )
+)
+header_login_button.click()
+
+email_address = input('メールアドレスを入力してください: ')
+password = getpass('パスワードを入力してください: ')
+
+parent_element = driver.find_element(By.CSS_SELECTOR, '.sc-pyfCe.cZfPwB')
+email_input = parent_element.find_element(By.NAME, 'email')
+password_input = parent_element.find_element(By.NAME, 'password')
+
+email_input.send_keys(email_address)
+password_input.send_keys(password)
+
+form_login_button = wait.until(
+    EC.visibility_of_element_located(
+        (By.CSS_SELECTOR,
+         '#root > div.sc-pyfCe.cZfPwB > div.sc-kDvujY.eCJBhf > div.sc-eDWCr.dePrRH > button')
+    )
+)
+form_login_button.click()
+
+wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'nav > img ')))
+
+driver.get('https://terakoya.sejuku.net/account/profile')
+
+wait = WebDriverWait(driver, 30)
+
+form_edit_button = wait.until(
+    EC.visibility_of_element_located(
+        (By.CSS_SELECTOR,
+         '#root > div.sc-dpJOxQ.foVZhP > div > div > main > div > div.sc-eGqszx.dWJgPR > button ')
+    )
+)
+form_edit_button.click()
+
+user_edit = input('自己紹介文を入力してください: ')
+
+parent_element = driver.find_element(By.CSS_SELECTOR, '#root > div.sc-dpJOxQ.foVZhP > div > div > main > div > div.sc-eGqszx.dWJgPR > div:nth-child(15) > div.sc-eJWqde.dDqups > textarea')
+edit_input = parent_element
+textarea = user_edit
+edit_input.send_keys(textarea)
+
+form_renewal_button = wait.until(
+    EC.visibility_of_element_located(
+        (By.CSS_SELECTOR,
+         '#root > div.sc-dpJOxQ.foVZhP > div > div > main > div > div.sc-eGqszx.dWJgPR > button.sc-eDvSVe.iklejs.sc-hrAajY.gIaqxw')
+    )
+)
+form_renewal_button.click()
+
+driver.save_screenshot('screenshot.png')
+driver.quit()
